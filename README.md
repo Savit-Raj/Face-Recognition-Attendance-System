@@ -1,7 +1,7 @@
 # Face-Recognition-Attendance-System
 This project is an attempt to modernise the current attendance taking practices in several organisations.
 <br>
-Before starting with the project I would like to divide the whole project into two parts:
+Before starting with the project I would like to divide the whole project into two parts:<br>
     1. The 'Basics.py' file and the 'ImageBasics' folder as one entity and,<br>
     2. The 'Attendance.py', 'Attendance.csv' files along with the 'Students' folder as another.<br>
 <br>
