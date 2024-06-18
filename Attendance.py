@@ -12,6 +12,9 @@ print(myList)
 
 for cl in myList:
     curImg = cv2.imread(f'{path}/{cl}')
+    if curImg is None:
+        print(f"Image {cl} not loaded correctly.")
+        continue
     images.append(curImg)
     classNames.append(os.path.splitext(cl)[0])
 print(classNames)
@@ -20,9 +23,10 @@ print(classNames)
 def findEncodings(images):
     encodeList = []
     for img in images:
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        encode = face_recognition.face_encodings(img)[0]
-        encodeList.append(encode)
+        if img is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            encode = face_recognition.face_encodings(img)[0]
+            encodeList.append(encode)
     return encodeList
 
 
@@ -44,19 +48,19 @@ cap = cv2.VideoCapture(0)
 while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
-    imgS = cv2.resize(img,(0,0),None,0.25,0.25)
+    imgS = cv2.resize(img, (0, 0), None, 0.25, 0.25)
     imgS = cv2.cvtColor(imgS, cv2.COLOR_BGR2RGB)
 
     facesInFrame = face_recognition.face_locations(imgS)
     encodesInFrame = face_recognition.face_encodings(imgS, facesInFrame)
 
-    for encodeFace,faceLoc in zip(encodesInFrame, facesInFrame):
+    for encodeFace, faceLoc in zip(encodesInFrame, facesInFrame):
         matches = face_recognition.compare_faces(encodeKnown, encodeFace)
         faceDis = face_recognition.face_distance(encodeKnown, encodeFace)
         # print(faceDis)
         matchIndex = np.argmin(faceDis)
 
-        if matches[matchIndex] and faceDis[matchIndex] < 0.3:
+        if matches[matchIndex] and faceDis[matchIndex] < 0.5:
             name = classNames[matchIndex].upper()
         else:
             name = 'UNKNOWN'
@@ -70,5 +74,5 @@ while True:
         if name != 'UNKNOWN':
             markAttendance(name)
 
-    cv2.imshow('Webcam',img)
+    cv2.imshow('Webcam', img)
     cv2.waitKey(1)
