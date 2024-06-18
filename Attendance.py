@@ -60,7 +60,7 @@ while True:
         # print(faceDis)
         matchIndex = np.argmin(faceDis)
 
-        if matches[matchIndex] and faceDis[matchIndex] < 0.5:
+        if matches[matchIndex] and faceDis[matchIndex] < 0.4:
             name = classNames[matchIndex].upper()
         else:
             name = 'UNKNOWN'
