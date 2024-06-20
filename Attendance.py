@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import face_recognition
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 path = 'Students'
 images = []
@@ -45,6 +45,8 @@ encodeKnown = findEncodings(images)
 print('Encoding Complete')
 
 cap = cv2.VideoCapture(0)
+recognition_times = {}
+
 while True:
     success, img = cap.read()
     img = cv2.flip(img, 1)
@@ -60,7 +62,7 @@ while True:
         # print(faceDis)
         matchIndex = np.argmin(faceDis)
 
-        if matches[matchIndex] and faceDis[matchIndex] < 0.4:
+        if matches[matchIndex] and faceDis[matchIndex] < 0.5:
             name = classNames[matchIndex].upper()
         else:
             name = 'UNKNOWN'
@@ -72,7 +74,19 @@ while True:
         cv2.putText(img, name, (x1 + 6, y2 - 6), cv2.FONT_HERSHEY_COMPLEX, 1, (255, 255, 255), 2)
 
         if name != 'UNKNOWN':
-            markAttendance(name)
+            now = datetime.now()
+            if name in recognition_times:
+                if now - recognition_times[name] >= timedelta(seconds=3):
+                    markAttendance(name)
+                    del recognition_times[name]
+            else:
+                recognition_times[name] = now
 
-    cv2.imshow('Webcam', img)
-    cv2.waitKey(1)
+            # Clean up recognition times to remove outdated entries
+        current_time = datetime.now()
+        recognition_times = {name: time for name, time in recognition_times.items() if
+                             current_time - time < timedelta(seconds=3)}
+
+        cv2.imshow('Webcam', img)
+        cv2.waitKey(1)
+
